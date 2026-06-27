@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>后台管理 - 云孪信息科技</title>
+<link rel="stylesheet" href="../assets/css/common.css">
+<link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="admin-sidebar-header"><div class="logo-icon">DW</div><div><h3>云孪信息科技</h3><span class="subtitle">后台管理系统</span></div></div>
+    <nav class="admin-nav">
+      <div class="nav-section"><div class="nav-section-title">概览</div><button class="nav-item active" data-panel="dashboard"><span class="nav-icon">■</span> 仪表盘</button></div>
+      <div class="nav-section">
+        <div class="nav-section-title">内容管理</div>
+        <button class="nav-item" data-panel="hero"><span class="nav-icon">■</span> 首页轮播</button>
+        <button class="nav-item" data-panel="solutions"><span class="nav-icon">■</span> 解决方案</button>
+        <button class="nav-item" data-panel="cases"><span class="nav-icon">■</span> 案例管理</button>
+        <button class="nav-item" data-panel="about"><span class="nav-icon">■</span> 关于我们</button>
+        <button class="nav-item" data-panel="news"><span class="nav-icon">■</span> 新闻管理</button>
+        <button class="nav-item" data-panel="contact"><span class="nav-icon">■</span> 联系方式</button>
+      </div>
+      <div class="nav-section"><div class="nav-section-title">系统设置</div><button class="nav-item" data-panel="navigation"><span class="nav-icon">■</span> 导航设置</button><button class="nav-item" data-panel="users"><span class="nav-icon">■</span> 用户管理</button></div>
+    </nav>
+    <div class="admin-sidebar-footer"><div class="user-info"><div class="user-avatar" id="sidebar-avatar">A</div><div><div class="user-name" id="sidebar-username">admin</div><div class="user-role" id="sidebar-role">管理员</div></div></div><button class="btn-logout" id="btn-logout">退出登录</button></div>
+  </aside>
+  <main class="admin-main" id="admin-panels">
+    <div class="admin-panel active" id="panel-dashboard">
+      <h2>仪表盘</h2>
+      <div class="stats-grid"><div class="stat-card"><div class="stat-value" id="stat-cases">0</div><div class="stat-label">已发布案例</div></div><div class="stat-card"><div class="stat-value" id="stat-solutions">0</div><div class="stat-label">已发布方案</div></div><div class="stat-card"><div class="stat-value" id="stat-news">0</div><div class="stat-label">已发布新闻</div></div></div>
+      <div class="card-glass" style="padding:30px;"><h3 style="margin-bottom:12px;">快速入门</h3><p style="color:var(--text-secondary);line-height:1.8;">欢迎使用云孪信息科技后台管理系统。通过左侧菜单可以管理网站各项内容。<br>1. <strong>首页轮播</strong> - 编辑 Hero 区域的轮播内容和图片<br>2. <strong>解决方案</strong> - 管理五大行业解决方案的展示内容<br>3. <strong>案例管理</strong> - 新增、编辑、发布项目案例<br>4. <strong>关于我们</strong> - 维护公司介绍、发展历程、团队等信息<br>5. <strong>新闻管理</strong> - 发布公司新闻动态<br>6. <strong>联系方式</strong> - 更新公司联系方式<br>7. <strong>导航设置</strong> - 管理网站导航菜单<br>8. <strong>用户管理</strong> - 管理系统用户（仅管理员可见）</p></div>
+    </div>
+    <div class="admin-panel" id="panel-hero"><h2>首页轮播管理</h2><div class="panel-toolbar"><span style="color:var(--text-secondary);font-size:0.9rem;">管理首页 Hero 区域的轮播内容</span><button class="btn-primary" data-add="heroSlides">+ 新增轮播</button></div><div id="hero-table"></div></div>
+    <div class="admin-panel" id="panel-solutions"><h2>解决方案管理</h2><div class="panel-toolbar"><span style="color:var(--text-secondary);font-size:0.9rem;">管理五大行业解决方案展示内容</span><button class="btn-primary" data-add="solutions">+ 新增方案</button></div><div id="solutions-table"></div></div>
+    <div class="admin-panel" id="panel-cases"><h2>案例管理</h2><div class="panel-toolbar"><span style="color:var(--text-secondary);font-size:0.9rem;">管理项目案例的展示内容</span><button class="btn-primary" data-add="cases">+ 新增案例</button></div><div id="cases-table"></div></div>
+    <div class="admin-panel" id="panel-about"><h2>关于我们</h2><p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:20px;">编辑公司介绍内容。发展历程、团队和资质请在下方编辑。</p><div id="about-editor"></div></div>
+    <div class="admin-panel" id="panel-news"><h2>新闻管理</h2><div class="panel-toolbar"><span style="color:var(--text-secondary);font-size:0.9rem;">管理公司新闻动态</span><button class="btn-primary" data-add="news">+ 新增新闻</button></div><div id="news-table"></div></div>
+    <div class="admin-panel" id="panel-contact"><h2>联系方式</h2><p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:20px;">编辑公司联系方式，前台联系页面将同步更新。</p><div id="contact-editor" style="max-width:500px;"></div></div>
+    <div class="admin-panel" id="panel-navigation"><h2>导航设置</h2><div class="panel-toolbar"><span style="color:var(--text-secondary);font-size:0.9rem;">管理网站顶部导航菜单</span><button class="btn-primary" data-add="navigation">+ 新增菜单</button></div><div id="nav-table"></div></div>
+    <div class="admin-panel" id="panel-users"><h2>用户管理</h2><div class="panel-toolbar"><span style="color:var(--text-secondary);font-size:0.9rem;">管理系统登录用户（仅管理员可访问）</span><button class="btn-primary" data-add="users">+ 新增用户</button></div><div id="users-table"></div></div>
+  </main>
+</div>
+<div class="modal-overlay" id="modal-overlay"><div class="modal" id="modal-content"></div></div>
+<script src="../assets/js/data.js"></script><script src="admin.js"></script>
+</body>
+</html>

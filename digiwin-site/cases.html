@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>案例 - 云孪信息科技</title>
+<link rel="stylesheet" href="assets/css/common.css">
+<style>
+.filter-bar {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 30px 0 40px;
+}
+.filter-btn {
+  padding: 8px 20px;
+  border-radius: 100px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+}
+.filter-btn:hover, .filter-btn.active {
+  background: rgba(0,229,255,0.1);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.case-card {
+  overflow: hidden;
+  padding: 0;
+  cursor: pointer;
+}
+.case-card .case-cover {
+  height: 200px;
+  background: linear-gradient(135deg, #152244, #0f1535);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  color: rgba(0,229,255,0.25);
+}
+.case-card .case-body {
+  padding: 24px;
+}
+.case-card .case-body h3 {
+  font-size: 1.1rem;
+  margin: 10px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.case-card .case-body p {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+</style>
+</head>
+<body>
+
+<div id="preloader"><div class="preloader-spinner"></div></div>
+
+<nav class="navbar">
+  <div class="container">
+    <a href="index.html" class="navbar-brand">
+      <span class="logo-icon">DW</span>
+      <span>云孪信息科技</span>
+    </a>
+    <div class="navbar-links" id="navbar-links"></div>
+    <button class="hamburger" aria-label="菜单">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<section class="page-hero">
+  <h1>案例展示</h1>
+  <p>每一个项目都是我们对卓越的承诺，见证数字孪生技术在真实场景中的价值落地</p>
+</section>
+
+<div class="container">
+  <div class="filter-bar" id="filter-bar">
+    <button class="filter-btn active" data-category="all">全部</button>
+    <button class="filter-btn" data-category="智慧城市">智慧城市</button>
+    <button class="filter-btn" data-category="智慧工厂">智慧工厂</button>
+    <button class="filter-btn" data-category="智慧农业">智慧农业</button>
+    <button class="filter-btn" data-category="军事仿真">军事仿真</button>
+    <button class="filter-btn" data-category="可视化大屏">可视化大屏</button>
+  </div>
+
+  <div class="grid-3" id="cases-grid" style="padding-bottom:80px;"></div>
+</div>
+
+<footer class="footer" id="dynamic-footer"></footer>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/main.js"></script>
+<script>
+(function() {
+  // 渲染导航
+  var nav = DataLayer.getData('navigation').filter(function(n) { return n.visible; });
+  document.getElementById('navbar-links').innerHTML = nav.map(function(n) {
+    return '<a href="' + n.href + '">' + n.label + '</a>';
+  }).join('');
+
+  // 渲染案例
+  var cases = DataLayer.getData('cases').filter(function(c) { return c.status === 'published'; });
+  cases.sort(function(a, b) { return a.order - b.order; });
+
+  function renderCases(filter) {
+    var filtered = filter === 'all' ? cases : cases.filter(function(c) { return c.category === filter; });
+    document.getElementById('cases-grid').innerHTML = filtered.map(function(c) {
+      return '<div class="card-glass case-card fade-in" data-category="' + c.category + '">' +
+        '<div class="case-cover">&#128196;</div>' +
+        '<div class="case-body"><span class="tag tag-cyan">' + c.category + '</span>' +
+        '<h3>' + c.title + '</h3><p>' + c.summary + '</p></div></div>';
+    }).join('');
+
+    // 重新触发动画
+    setTimeout(function() {
+      document.querySelectorAll('.fade-in').forEach(function(el) {
+        el.classList.add('visible');
+      });
+    }, 50);
+  }
+
+  renderCases('all');
+
+  // 筛选事件已在 main.js 中处理
+})();
+</script>
+</body>
+</html>

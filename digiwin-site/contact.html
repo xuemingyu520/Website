@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>联系我们 - 云孪信息科技</title>
+<link rel="stylesheet" href="assets/css/common.css">
+<style>
+.contact-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 40px 20px 80px;
+}
+.contact-form {
+  padding: 40px;
+}
+.contact-form h3 { font-size: 1.4rem; margin-bottom: 24px; font-weight: 700; }
+.contact-form .form-group { margin-bottom: 18px; }
+.contact-form label {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+.contact-form input:focus,
+.contact-form textarea:focus {
+  border-color: var(--accent);
+}
+.contact-form textarea { min-height: 120px; resize: vertical; }
+.contact-form .btn-primary { width: 100%; margin-top: 8px; }
+
+.contact-info-card {
+  padding: 40px;
+  align-self: start;
+}
+.contact-info-card h3 { font-size: 1.4rem; margin-bottom: 24px; font-weight: 700; }
+.contact-item {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+.contact-item .c-icon {
+  width: 44px; height: 44px;
+  background: rgba(0,229,255,0.08);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+.contact-item h4 { font-size: 0.95rem; margin-bottom: 2px; }
+.contact-item p { font-size: 0.9rem; color: var(--text-secondary); }
+
+.map-placeholder {
+  height: 240px;
+  background: linear-gradient(135deg, #1a1a3e, #0f1535);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  border: 1px solid var(--card-border);
+  margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+  .contact-layout { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div id="preloader"><div class="preloader-spinner"></div></div>
+
+<nav class="navbar">
+  <div class="container">
+    <a href="index.html" class="navbar-brand">
+      <span class="logo-icon">DW</span>
+      <span>云孪信息科技</span>
+    </a>
+    <div class="navbar-links" id="navbar-links"></div>
+    <button class="hamburger" aria-label="菜单">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<section class="page-hero">
+  <h1>联系我们</h1>
+  <p>期待与您携手共创数字未来</p>
+</section>
+
+<div class="contact-layout">
+  <!-- 表单 -->
+  <div class="card-glass contact-form fade-in">
+    <h3>在线咨询</h3>
+    <form id="contact-form">
+      <div class="form-group">
+        <label for="ct-name">姓名 *</label>
+        <input type="text" id="ct-name" placeholder="请输入您的姓名" required>
+      </div>
+      <div class="form-group">
+        <label for="ct-company">公司名称</label>
+        <input type="text" id="ct-company" placeholder="请输入公司名称">
+      </div>
+      <div class="form-group">
+        <label for="ct-email">邮箱 *</label>
+        <input type="email" id="ct-email-input" placeholder="请输入您的邮箱" required>
+      </div>
+      <div class="form-group">
+        <label for="ct-phone">电话</label>
+        <input type="tel" id="ct-phone-input" placeholder="请输入您的电话">
+      </div>
+      <div class="form-group">
+        <label for="ct-message">需求描述</label>
+        <textarea id="ct-message" placeholder="请简要描述您的需求，我们将尽快与您联系"></textarea>
+      </div>
+      <button type="submit" class="btn-primary">提交咨询</button>
+    </form>
+  </div>
+
+  <!-- 联系信息 -->
+  <div class="card-glass contact-info-card fade-in" id="contact-info">
+    <h3>联系方式</h3>
+    <div class="contact-item">
+      <div class="c-icon">&#128205;</div>
+      <div><h4>公司地址</h4><p id="ci-address"></p></div>
+    </div>
+    <div class="contact-item">
+      <div class="c-icon">&#128222;</div>
+      <div><h4>电话</h4><p id="ci-phone"></p></div>
+    </div>
+    <div class="contact-item">
+      <div class="c-icon">&#128231;</div>
+      <div><h4>邮箱</h4><p id="ci-email"></p></div>
+    </div>
+    <div class="contact-item">
+      <div class="c-icon">&#128172;</div>
+      <div><h4>微信</h4><p id="ci-wechat"></p></div>
+    </div>
+    <div class="map-placeholder">&#128506; 地图展示区域（山东省临沂市兰山区北城新区）</div>
+  </div>
+</div>
+
+<footer class="footer" id="dynamic-footer"></footer>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/main.js"></script>
+<script>
+(function() {
+  var nav = DataLayer.getData('navigation').filter(function(n) { return n.visible; });
+  document.getElementById('navbar-links').innerHTML = nav.map(function(n) {
+    return '<a href="' + n.href + '">' + n.label + '</a>';
+  }).join('');
+
+  var contact = DataLayer.getData('contact');
+  document.getElementById('ci-address').textContent = contact.address;
+  document.getElementById('ci-phone').textContent = contact.phone;
+  document.getElementById('ci-email').textContent = contact.email;
+  document.getElementById('ci-wechat').textContent = contact.wechat;
+
+  // 表单提交
+  document.getElementById('contact-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var name = document.getElementById('ct-name').value.trim();
+    var email = document.getElementById('ct-email-input').value.trim();
+    if (!name || !email) {
+      alert('请填写姓名和邮箱');
+      return;
+    }
+    alert('感谢您的咨询，' + name + '！我们将在 1 个工作日内与您联系。');
+    this.reset();
+  });
+})();
+</script>
+</body>
+</html>

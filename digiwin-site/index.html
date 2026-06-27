@@ -1,0 +1,146 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>云孪信息科技 - 数字孪生驱动产业未来</title>
+<link rel="stylesheet" href="assets/css/common.css">
+<style>
+.hero { position: relative; height: 100vh; min-height: 700px; display: flex; align-items: center; justify-content: center; text-align: center; overflow: hidden; }
+#particles-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+.hero-content { position: relative; z-index: 1; max-width: 800px; padding: 0 20px; }
+.hero-content h1 { font-size: 3.5rem; font-weight: 700; margin-bottom: 20px; line-height: 1.2; }
+.hero-content h1 span { background: linear-gradient(135deg, #00e5ff, #1a5fdc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.hero-content .hero-subtitle { font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 32px; line-height: 1.7; }
+.hero-content .hero-desc { font-size: 1rem; color: var(--text-secondary); margin-bottom: 40px; max-width: 600px; margin-left: auto; margin-right: auto; }
+.hero-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+.scroll-indicator { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 1; cursor: pointer; animation: bounce 2s infinite; }
+.scroll-indicator .mouse { width: 26px; height: 40px; border: 2px solid rgba(255,255,255,0.4); border-radius: 14px; position: relative; }
+.scroll-indicator .mouse::after { content: ''; position: absolute; width: 4px; height: 8px; background: var(--accent); border-radius: 2px; left: 50%; top: 8px; transform: translateX(-50%); animation: scroll 1.5s infinite; }
+@keyframes bounce { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(8px); } }
+@keyframes scroll { 0% { opacity: 1; top: 8px; } 100% { opacity: 0; top: 22px; } }
+#capabilities { padding: 100px 20px; }
+.cap-card { text-align: center; padding: 40px 24px; }
+.cap-card .cap-icon { width: 64px; height: 64px; background: linear-gradient(135deg, rgba(26,95,220,0.2), rgba(0,229,255,0.15)); border-radius: 16px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 2rem; }
+.cap-card h3 { font-size: 1.2rem; margin-bottom: 10px; }
+.cap-card p { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; }
+#solutions { padding: 100px 20px; background: rgba(0,0,0,0.2); }
+.sol-card { overflow: hidden; padding: 0; }
+.sol-card .sol-cover { height: 180px; background: linear-gradient(135deg, #1a1a3e, #0f1535); display: flex; align-items: center; justify-content: center; font-size: 3rem; }
+.sol-card .sol-body { padding: 24px; }
+.sol-card .sol-body h3 { font-size: 1.15rem; margin-bottom: 10px; }
+.sol-card .sol-body p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px; }
+#featured-cases { padding: 100px 20px; }
+.case-card-home { overflow: hidden; padding: 0; }
+.case-card-home .case-cover { height: 200px; background: linear-gradient(135deg, #152244, #0f1535); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: rgba(0,229,255,0.3); }
+.case-card-home .case-body { padding: 24px; }
+.case-card-home .case-body h3 { font-size: 1.1rem; margin: 10px 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.case-card-home .case-body p { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 14px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+#advantages { padding: 100px 20px; background: rgba(0,0,0,0.2); }
+.adv-item { display: flex; gap: 16px; align-items: flex-start; padding: 20px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.adv-item:last-child { border: none; }
+.adv-item .adv-icon { width: 44px; height: 44px; background: rgba(0,229,255,0.1); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0; }
+.adv-item h4 { font-size: 1.05rem; margin-bottom: 4px; }
+.adv-item p { font-size: 0.9rem; color: var(--text-secondary); }
+#cta-section { padding: 100px 20px; text-align: center; background: linear-gradient(180deg, transparent, rgba(26,95,220,0.05), transparent); }
+#cta-section h2 { font-size: 2.2rem; margin-bottom: 16px; }
+#cta-section p { color: var(--text-secondary); margin-bottom: 32px; font-size: 1.1rem; }
+@media (max-width: 768px) { .hero-content h1 { font-size: 2.2rem; } .hero-content .hero-subtitle { font-size: 1rem; } #cta-section h2 { font-size: 1.6rem; } }
+</style>
+</head>
+<body>
+<div id="preloader"><div class="preloader-spinner"></div></div>
+<nav class="navbar">
+  <div class="container">
+    <a href="index.html" class="navbar-brand"><span class="logo-icon">DW</span><span>云孪信息科技</span></a>
+    <div class="navbar-links" id="navbar-links"></div>
+    <button class="hamburger" aria-label="菜单"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<section class="hero" id="hero">
+  <canvas id="particles-canvas"></canvas>
+  <div class="hero-content">
+    <h1><span>数字孪生</span><br>驱动产业未来</h1>
+    <p class="hero-subtitle">以高精度三维可视化与实时数据融合，为城市、工厂、农业和国防提供全域数字底座</p>
+    <p class="hero-desc" id="hero-desc">融合 BIM + GIS + IoT，构建从宏观到微观的全要素数字镜像，赋能智慧决策与降本增效。</p>
+    <div class="hero-actions" id="hero-actions">
+      <a href="solutions.html" class="btn-primary">探索解决方案</a>
+      <a href="cases.html" class="btn-outline">查看案例</a>
+    </div>
+  </div>
+  <div class="scroll-indicator"><div class="mouse"></div></div>
+</section>
+<section id="capabilities">
+  <div class="container">
+    <div class="section-header fade-in">
+      <h2 class="section-title">核心能力</h2>
+      <p class="section-subtitle">以三大核心技术构建数字孪生全栈能力</p>
+    </div>
+    <div class="grid-3">
+      <div class="card-glass cap-card fade-in"><div class="cap-icon">🌐</div><h3>三维可视化</h3><p>自主研发高性能三维渲染引擎，支持城市级海量模型加载，从宏观场景到微观细节自由缩放、流畅交互。</p></div>
+      <div class="card-glass cap-card fade-in"><div class="cap-icon">📊</div><h3>数据驱动</h3><p>实时接入 IoT、视频、业务系统等多元数据，通过流处理引擎实现毫秒级融合与动态呈现。</p></div>
+      <div class="card-glass cap-card fade-in"><div class="cap-icon">🏭</div><h3>行业落地</h3><p>深耕智慧城市、智能制造、智慧农业、军事仿真、可视化大屏五大行业，拥有丰富的标杆案例和交付经验。</p></div>
+    </div>
+  </div>
+</section>
+<section id="solutions">
+  <div class="container">
+    <div class="section-header fade-in">
+      <h2 class="section-title">行业解决方案</h2>
+      <p class="section-subtitle">覆盖五大核心领域，打造行业级数字孪生应用</p>
+    </div>
+    <div class="grid-3" id="solutions-grid"></div>
+  </div>
+</section>
+<section id="featured-cases">
+  <div class="container">
+    <div class="section-header fade-in">
+      <h2 class="section-title">精选案例</h2>
+      <p class="section-subtitle">每一个项目，都是我们对卓越的承诺</p>
+    </div>
+    <div class="grid-3" id="featured-cases-grid"></div>
+    <div style="text-align:center;margin-top:40px;" class="fade-in"><a href="cases.html" class="btn-outline">查看全部案例</a></div>
+  </div>
+</section>
+<section id="advantages">
+  <div class="container">
+    <div class="section-header fade-in">
+      <h2 class="section-title">技术优势</h2>
+      <p class="section-subtitle">自主可控的技术体系，安全可靠的产品保障</p>
+    </div>
+    <div class="grid-2" style="max-width:900px;margin:0 auto;">
+      <div class="adv-item fade-in"><div class="adv-icon">⚙</div><div><h4>自研三维引擎</h4><p>完全自主研发，不依赖国外商业引擎，支持国产操作系统和芯片适配。</p></div></div>
+      <div class="adv-item fade-in"><div class="adv-icon">🛠</div><div><h4>海量数据接入</h4><p>支持 50+ 数据源类型，单平台百万级点位并发，秒级实时更新。</p></div></div>
+      <div class="adv-item fade-in"><div class="adv-icon">🔒</div><div><h4>信创安全认证</h4><p>通过国家信创安全认证，满足政府和国防领域的严格安全要求。</p></div></div>
+      <div class="adv-item fade-in"><div class="adv-icon">⚡</div><div><h4>AI 融合能力</h4><p>集成机器学习与深度学习算法，实现预测性维护、智能决策和自动化分析。</p></div></div>
+      <div class="adv-item fade-in"><div class="adv-icon">📱</div><div><h4>多端适配</h4><p>大屏、PC、平板、AR眼镜全覆盖，一套平台多端呈现。</p></div></div>
+      <div class="adv-item fade-in"><div class="adv-icon">💪</div><div><h4>7x24 运维保障</h4><p>双机热备、自动故障切换，关键业务零中断，99.99% 可用性。</p></div></div>
+    </div>
+  </div>
+</section>
+<section id="cta-section">
+  <div class="container fade-in">
+    <h2>开启数字化转型之旅</h2>
+    <p>无论您处于数字化转型的哪个阶段，我们都将为您量身定制解决方案</p>
+    <a href="contact.html" class="btn-primary" style="font-size:1.1rem;padding:16px 40px;">立即咨询</a>
+  </div>
+</section>
+<footer class="footer" id="dynamic-footer"></footer>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/particles.js"></script>
+<script src="assets/js/main.js"></script>
+<script>
+(function() {
+  var nav = DataLayer.getData('navigation').filter(function(n) { return n.visible; });
+  document.getElementById('navbar-links').innerHTML = nav.map(function(n) { return '<a href="' + n.href + '">' + n.label + '</a>'; }).join('');
+  var solutions = DataLayer.getData('solutions').filter(function(s) { return s.status === 'published'; });
+  solutions.sort(function(a, b) { return a.order - b.order; });
+  var icons = { city: '🏙️', factory: '🏭', agriculture: '🌱', military: '🛰️', visual: '🖥️' };
+  document.getElementById('solutions-grid').innerHTML = solutions.map(function(s) { return '<a href="solutions.html#' + s.id + '" class="card-glass sol-card fade-in visible"><div class="sol-cover">' + (icons[s.icon] || '●') + '</div><div class="sol-body"><h3>' + s.title + '</h3><p>' + s.summary + '</p><span style="color:var(--accent);font-size:0.9rem;font-weight:600;">了解详情 &rarr;</span></div></a>'; }).join('');
+  var cases = DataLayer.getData('cases').filter(function(c) { return c.status === 'published'; });
+  cases.sort(function(a, b) { return a.order - b.order; });
+  document.getElementById('featured-cases-grid').innerHTML = cases.slice(0, 3).map(function(c) { return '<div class="card-glass case-card-home fade-in visible"><div class="case-cover">📄</div><div class="case-body"><span class="tag tag-cyan">' + c.category + '</span><h3>' + c.title + '</h3><p>' + c.summary + '</p></div></div>'; }).join('');
+})();
+</script>
+</body>
+</html>

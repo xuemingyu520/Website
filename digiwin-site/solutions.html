@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>解决方案 - 云孪信息科技</title>
+<link rel="stylesheet" href="assets/css/common.css">
+<style>
+.solutions-layout {
+  display: flex;
+  gap: 40px;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 40px 20px 80px;
+}
+.solutions-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 90px;
+  align-self: flex-start;
+}
+.solutions-sidebar a {
+  display: block;
+  padding: 10px 16px;
+  border-left: 2px solid transparent;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  transition: all var(--transition-fast);
+  margin-bottom: 2px;
+  border-radius: 0 4px 4px 0;
+}
+.solutions-sidebar a:hover, .solutions-sidebar a.active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  background: rgba(0,229,255,0.05);
+}
+.solutions-content { flex: 1; min-width: 0; }
+.solution-section {
+  margin-bottom: 60px;
+  padding-bottom: 60px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.solution-section:last-child { border: none; }
+.solution-section h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: var(--accent);
+}
+.solution-section h3 {
+  font-size: 1.2rem;
+  margin: 24px 0 10px;
+  color: var(--text-primary);
+}
+.solution-section p {
+  color: var(--text-secondary);
+  line-height: 1.9;
+  margin-bottom: 14px;
+}
+.solution-section ul {
+  list-style: disc;
+  padding-left: 24px;
+  color: var(--text-secondary);
+  line-height: 1.9;
+  margin-bottom: 16px;
+}
+.solution-section ul li { margin-bottom: 6px; }
+.solution-cover {
+  height: 260px;
+  background: linear-gradient(135deg, #1a1a3e, #0f1535);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+  margin-bottom: 30px;
+  border: 1px solid var(--card-border);
+}
+
+@media (max-width: 768px) {
+  .solutions-layout { flex-direction: column; }
+  .solutions-sidebar {
+    width: 100%;
+    position: static;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .solutions-sidebar a {
+    border-left: none;
+    border-bottom: 2px solid transparent;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+  .solutions-sidebar a.active { border-bottom-color: var(--accent); }
+}
+</style>
+</head>
+<body>
+
+<div id="preloader"><div class="preloader-spinner"></div></div>
+
+<nav class="navbar">
+  <div class="container">
+    <a href="index.html" class="navbar-brand">
+      <span class="logo-icon">DW</span>
+      <span>云孪信息科技</span>
+    </a>
+    <div class="navbar-links" id="navbar-links"></div>
+    <button class="hamburger" aria-label="菜单">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<section class="page-hero">
+  <h1>解决方案</h1>
+  <p>覆盖五大核心行业，提供从咨询规划到交付运营的全栈式数字孪生解决方案</p>
+</section>
+
+<div class="solutions-layout">
+  <aside class="solutions-sidebar" id="solutions-sidebar"></aside>
+  <main class="solutions-content" id="solutions-content"></main>
+</div>
+
+<footer class="footer" id="dynamic-footer"></footer>
+
+<script src="assets/js/data.js"></script>
+<script src="assets/js/main.js"></script>
+<script>
+(function() {
+  var nav = DataLayer.getData('navigation').filter(function(n) { return n.visible; });
+  document.getElementById('navbar-links').innerHTML = nav.map(function(n) {
+    return '<a href="' + n.href + '">' + n.label + '</a>';
+  }).join('');
+
+  var solutions = DataLayer.getData('solutions').filter(function(s) { return s.status === 'published'; });
+  solutions.sort(function(a, b) { return a.order - b.order; });
+  var icons = { city: '&#127753;', factory: '&#127981;', agriculture: '&#127793;', military: '&#127760;', visual: '&#128187;' };
+
+  // 侧边栏
+  document.getElementById('solutions-sidebar').innerHTML = solutions.map(function(s) {
+    return '<a href="#' + s.id + '">' + s.title + '</a>';
+  }).join('');
+
+  // 内容
+  document.getElementById('solutions-content').innerHTML = solutions.map(function(s) {
+    return '<section class="solution-section" id="' + s.id + '">' +
+      '<div class="solution-cover">' + (icons[s.icon] || '&#9679;') + '</div>' +
+      s.detailContent +
+      '</section>';
+  }).join('');
+
+  // 侧边栏滚动激活
+  var sidebarLinks = document.querySelectorAll('.solutions-sidebar a');
+  var sections = document.querySelectorAll('.solution-section');
+
+  function updateActive() {
+    var scrollPos = window.scrollY + 120;
+    sections.forEach(function(sec, i) {
+      if (sec.offsetTop <= scrollPos && (i === sections.length - 1 || sections[i + 1].offsetTop > scrollPos)) {
+        sidebarLinks.forEach(function(l) { l.classList.remove('active'); });
+        sidebarLinks[i].classList.add('active');
+      }
+    });
+  }
+
+  // hash 跳转
+  var hash = window.location.hash;
+  if (hash) {
+    setTimeout(function() {
+      var target = document.querySelector(hash);
+      if (target) target.scrollIntoView({ behavior: 'smooth' });
+    }, 200);
+  }
+
+  window.addEventListener('scroll', updateActive);
+  updateActive();
+})();
+</script>
+</body>
+</html>
