@@ -7,7 +7,7 @@ const DataLayer = (function () {
 
   const STORAGE_KEY = 'digiwin_site_data';
   const VERSION_KEY = 'digiwin_site_version';
-  const DATA_VERSION = 4;
+  const DATA_VERSION = 5;
 
   const defaultData = {
     siteConfig: {
@@ -444,7 +444,7 @@ const DataLayer = (function () {
   function isValidData(data) {
     if (!data || typeof data !== 'object') return false;
     // 核心数组必须存在且为非空数组
-    var keys = ['solutions', 'cases', 'heroSlides', 'navigation'];
+    var keys = ['solutions', 'cases', 'heroSlides', 'navigation', 'users'];
     for (var i = 0; i < keys.length; i++) {
       var arr = data[keys[i]];
       if (!Array.isArray(arr) || arr.length === 0) return false;
@@ -452,6 +452,7 @@ const DataLayer = (function () {
     // solutions 和 cases 必须包含 id/title/status
     if (!data.solutions[0].id || !data.solutions[0].title || !data.solutions[0].status) return false;
     if (!data.cases[0].id || !data.cases[0].title || !data.cases[0].status) return false;
+    if (!data.users[0].username || !data.users[0].password || !data.users[0].role) return false;
     return true;
   }
 
