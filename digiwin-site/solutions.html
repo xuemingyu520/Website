@@ -140,6 +140,10 @@
   var solutions = DataLayer.getData('solutions').filter(function(s) { return s.status === 'published'; });
   solutions.sort(function(a, b) { return a.order - b.order; });
   var icons = { city: '&#127753;', factory: '&#127981;', agriculture: '&#127793;', military: '&#127760;', visual: '&#128187;' };
+  function coverStyle(url) {
+    if (!url) return '';
+    return ' style="background-image:url(\'' + String(url).replace(/'/g, '%27') + '\');background-size:cover;background-position:center;"';
+  }
 
   // 侧边栏
   document.getElementById('solutions-sidebar').innerHTML = solutions.map(function(s) {
@@ -149,7 +153,7 @@
   // 内容
   document.getElementById('solutions-content').innerHTML = solutions.map(function(s) {
     return '<section class="solution-section" id="' + s.id + '">' +
-      '<div class="solution-cover">' + (icons[s.icon] || '&#9679;') + '</div>' +
+      '<div class="solution-cover"' + coverStyle(s.coverImage) + '>' + (s.coverImage ? '' : (icons[s.icon] || '&#9679;')) + '</div>' +
       s.detailContent +
       '</section>';
   }).join('');

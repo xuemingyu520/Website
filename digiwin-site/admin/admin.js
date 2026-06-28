@@ -122,6 +122,53 @@
     setTimeout(function () { toast.remove(); }, 2500);
   }
 
+  function showSaveError() {
+    var error = DataLayer.getLastSaveError && DataLayer.getLastSaveError();
+    var isQuotaError = error && (error.name === 'QuotaExceededError' || error.code === 22);
+    showToast(isQuotaError ? '保存失败：浏览器本地存储空间不足，请压缩图片或删除旧图片后再试' : '保存失败，请检查浏览器存储权限', 'error');
+  }
+
+  function readCompressedImage(file, callback) {
+    var reader = new FileReader();
+    reader.onload = function (e) {
+      var image = new Image();
+      image.onload = function () {
+        var maxSize = 1200;
+        var width = image.width;
+        var height = image.height;
+        if (width > maxSize || height > maxSize) {
+          var ratio = Math.min(maxSize / width, maxSize / height);
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
+        }
+
+        var canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(image, 0, 0, width, height);
+        var dataUrl = canvas.toDataURL('image/jpeg', 0.76);
+
+        if (dataUrl.length > 900 * 1024) {
+          showToast('图片压缩后仍然过大，请换一张更小的图片', 'error');
+          callback(null);
+          return;
+        }
+        callback(dataUrl);
+      };
+      image.onerror = function () {
+        showToast('图片读取失败，请更换图片后重试', 'error');
+        callback(null);
+      };
+      image.src = e.target.result;
+    };
+    reader.onerror = function () {
+      showToast('图片读取失败，请更换图片后重试', 'error');
+      callback(null);
+    };
+    reader.readAsDataURL(file);
+  }
+
   // ---- 仪表盘 ----
   function updateDashboard() {
     var cases = DataLayer.getData('cases').filter(function (c) { return c.status === 'published'; });
@@ -193,18 +240,27 @@
       openEditModal(dataKey, item);
     } else if (action === 'delete') {
       if (!confirm('确定要删除此项吗？此操作不可恢复。')) return;
-      DataLayer.deleteItem(dataKey, id);
+      if (!DataLayer.deleteItem(dataKey, id)) {
+        showSaveError();
+        return;
+      }
       showToast('删除成功', 'success');
       refreshCurrentPanel();
     } else if (action === 'toggle-status') {
       var item = DataLayer.getItemById(dataKey, id);
       var newStatus = item.status === 'published' ? 'draft' : 'published';
-      DataLayer.updateItem(dataKey, id, { status: newStatus });
+      if (!DataLayer.updateItem(dataKey, id, { status: newStatus })) {
+        showSaveError();
+        return;
+      }
       showToast('状态已切换', 'success');
       refreshCurrentPanel();
     } else if (action === 'toggle-visible') {
       var navItem = DataLayer.getItemById(dataKey, id);
-      DataLayer.updateItem(dataKey, id, { visible: !navItem.visible });
+      if (!DataLayer.updateItem(dataKey, id, { visible: !navItem.visible })) {
+        showSaveError();
+        return;
+      }
       showToast('可见性已切换', 'success');
       refreshCurrentPanel();
     } else if (action === 'preview') {
@@ -220,9 +276,9 @@
   // ---- 预览 ----
   function previewItem(dataKey, item) {
     if (dataKey === 'cases') {
-      window.open('../../case-detail.html?id=' + item.id, '_blank');
+      window.open('../case-detail.html?id=' + item.id, '_blank');
     } else if (dataKey === 'solutions') {
-      window.open('../../solutions.html#' + item.id, '_blank');
+      window.open('../solutions.html#' + item.id, '_blank');
     }
   }
 
@@ -251,12 +307,15 @@
       } else if (field.type === 'number') {
         html += '<input type="number" id="field-' + field.key + '" value="' + val + '">';
       } else if (field.type === 'upload') {
-        var previewHtml = val ? '<img src="' + escapeHtml(val) + '" class="upload-preview-img" id="preview-' + field.key + '">' : '<div class="upload-preview-img upload-preview-placeholder" id="preview-' + field.key + '">暂无图片</div>';
+        var previewDisplay = val ? 'block' : 'none';
+        var placeholderDisplay = val ? 'none' : 'flex';
         html += '<div class="upload-group">';
         html += '<input type="file" id="file-' + field.key + '" accept="image/*" style="display:none;">';
         html += '<input type="hidden" id="field-' + field.key + '" value="' + escapeHtml(val) + '">';
-        html += previewHtml;
+        html += '<img src="' + escapeHtml(val) + '" class="upload-preview-img" id="preview-' + field.key + '" style="display:' + previewDisplay + ';">';
+        html += '<div class="upload-preview-img upload-preview-placeholder" id="preview-placeholder-' + field.key + '" style="display:' + placeholderDisplay + ';">暂无图片</div>';
         html += '<button type="button" class="btn-sm btn-edit upload-btn" data-upload-key="' + field.key + '">选择图片</button>';
+        html += '<button type="button" class="btn-sm btn-delete upload-remove-btn" data-upload-key="' + field.key + '">移除图片</button>';
         html += '<span class="upload-hint">支持 JPG/PNG，建议小于 1MB</span>';
         html += '</div>';
       } else {
@@ -278,22 +337,42 @@
         fileInput.onchange = function () {
           var file = fileInput.files[0];
           if (!file) return;
-          if (file.size > 2 * 1024 * 1024) {
-            showToast('图片大小不能超过 2MB', 'error');
+          if (file.size > 5 * 1024 * 1024) {
+            showToast('图片大小不能超过 5MB', 'error');
             return;
           }
-          var reader = new FileReader();
-          reader.onload = function (e) {
-            document.getElementById('field-' + key).value = e.target.result;
+          readCompressedImage(file, function (dataUrl) {
+            if (!dataUrl) return;
+            document.getElementById('field-' + key).value = dataUrl;
             var preview = document.getElementById('preview-' + key);
+            var placeholder = document.getElementById('preview-placeholder-' + key);
             if (preview) {
               preview.className = 'upload-preview-img';
-              preview.src = e.target.result;
+              preview.src = dataUrl;
               preview.style.display = 'block';
             }
-          };
-          reader.readAsDataURL(file);
+            if (placeholder) {
+              placeholder.style.display = 'none';
+            }
+          });
         };
+      });
+    });
+
+    content.querySelectorAll('.upload-remove-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var key = this.getAttribute('data-upload-key');
+        var field = document.getElementById('field-' + key);
+        var preview = document.getElementById('preview-' + key);
+        var placeholder = document.getElementById('preview-placeholder-' + key);
+        if (field) field.value = '';
+        if (preview) {
+          preview.removeAttribute('src');
+          preview.style.display = 'none';
+        }
+        if (placeholder) {
+          placeholder.style.display = 'flex';
+        }
       });
     });
 
@@ -309,8 +388,11 @@
           result[field.key] = val;
         }
       });
-      closeModal();
-      if (callback) callback(result);
+      var shouldClose = true;
+      if (callback) {
+        shouldClose = callback(result) !== false;
+      }
+      if (shouldClose) closeModal();
     });
 
     overlay.addEventListener('click', function (e) {
@@ -331,13 +413,20 @@
           if (dataKey === 'heroSlides') {
             values.status = values.status || 'draft';
           }
-          DataLayer.addItem(dataKey, values);
+          if (!DataLayer.addItem(dataKey, values)) {
+            showSaveError();
+            return false;
+          }
           showToast('创建成功', 'success');
         } else {
-          DataLayer.updateItem(dataKey, item.id, values);
+          if (!DataLayer.updateItem(dataKey, item.id, values)) {
+            showSaveError();
+            return false;
+          }
           showToast('更新成功', 'success');
         }
         refreshCurrentPanel();
+        return true;
       }
     );
   }
@@ -469,13 +558,16 @@
     panel.innerHTML = '\n      <div class="form-group"><label>公司地址</label><input type="text" id="ct-address" value="' + escapeHtml(contact.address) + '"></div>\n      <div class="form-group"><label>电话</label><input type="text" id="ct-phone" value="' + escapeHtml(contact.phone) + '"></div>\n      <div class="form-group"><label>邮箱</label><input type="text" id="ct-email" value="' + escapeHtml(contact.email) + '"></div>\n      <div class="form-group"><label>微信</label><input type="text" id="ct-wechat" value="' + escapeHtml(contact.wechat) + '"></div>\n      <button class="btn-primary" id="btn-save-contact">保存联系方式</button>\n    ';
 
     document.getElementById('btn-save-contact').addEventListener('click', function () {
-      DataLayer.setData('contact', {
+      if (!DataLayer.setData('contact', {
         address: document.getElementById('ct-address').value,
         phone: document.getElementById('ct-phone').value,
         email: document.getElementById('ct-email').value,
         wechat: document.getElementById('ct-wechat').value,
         mapEmbed: contact.mapEmbed
-      });
+      })) {
+        showSaveError();
+        return;
+      }
       showToast('联系方式已更新', 'success');
     });
   }
@@ -507,12 +599,19 @@
           if (isNew) {
             values.id = 'nav-' + Date.now();
             values.visible = true;
-            DataLayer.addItem(dataKey, values);
+            if (!DataLayer.addItem(dataKey, values)) {
+              showSaveError();
+              return false;
+            }
           } else {
-            DataLayer.updateItem(dataKey, item.id, values);
+            if (!DataLayer.updateItem(dataKey, item.id, values)) {
+              showSaveError();
+              return false;
+            }
           }
           showToast('导航已更新', 'success');
           refreshCurrentPanel();
+          return true;
         });
       } else {
         origOpenEditModal(dataKey, item);
@@ -543,13 +642,20 @@
         var isNew = !item;
         openModal(isNew ? '新增用户' : '编辑用户', fields, item || {}, function (values) {
           if (isNew) {
-            DataLayer.addItem(dataKey, values);
+            if (!DataLayer.addItem(dataKey, values)) {
+              showSaveError();
+              return false;
+            }
             showToast('用户创建成功', 'success');
           } else {
-            DataLayer.updateItem(dataKey, item.id, values);
+            if (!DataLayer.updateItem(dataKey, item.id, values)) {
+              showSaveError();
+              return false;
+            }
             showToast('用户已更新', 'success');
           }
           refreshCurrentPanel();
+          return true;
         });
       } else {
         orig(dataKey, item);
@@ -567,7 +673,10 @@
     document.getElementById('btn-save-about').addEventListener('click', function () {
       var updated = DataLayer.getData('about');
       updated.companyIntro = document.getElementById('ab-intro').value;
-      DataLayer.setData('about', updated);
+      if (!DataLayer.setData('about', updated)) {
+        showSaveError();
+        return;
+      }
       showToast('关于我们已更新', 'success');
     });
   }

@@ -440,6 +440,7 @@ const DataLayer = (function () {
   };
 
   let _data = null;
+  let _lastSaveError = null;
 
   function isValidData(data) {
     if (!data || typeof data !== 'object') return false;
@@ -480,8 +481,12 @@ const DataLayer = (function () {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(_data));
       localStorage.setItem(VERSION_KEY, String(DATA_VERSION));
+      _lastSaveError = null;
+      return true;
     } catch (e) {
+      _lastSaveError = e;
       console.error('数据保存失败:', e);
+      return false;
     }
   }
 
@@ -510,8 +515,13 @@ const DataLayer = (function () {
       }
       target = target[keys[i]];
     }
-    target[keys[keys.length - 1]] = value;
-    save();
+    const lastKey = keys[keys.length - 1];
+    const oldValue = target[lastKey];
+    target[lastKey] = value;
+    if (!save()) {
+      target[lastKey] = oldValue;
+      return false;
+    }
     return true;
   }
 
@@ -526,32 +536,32 @@ const DataLayer = (function () {
   }
 
   function addItem(key, item) {
-    const items = getItems(key);
+    const items = getItems(key).slice();
     items.push(item);
-    setData(key, items);
-    return item;
+    return setData(key, items) ? item : null;
   }
 
   function updateItem(key, id, updates) {
-    const items = getItems(key);
+    const items = getItems(key).slice();
     const index = items.findIndex(item => item.id === id);
     if (index === -1) return null;
     items[index] = { ...items[index], ...updates };
-    setData(key, items);
-    return items[index];
+    return setData(key, items) ? items[index] : null;
   }
 
   function deleteItem(key, id) {
     let items = getItems(key);
     items = items.filter(item => item.id !== id);
-    setData(key, items);
-    return true;
+    return setData(key, items);
   }
 
   function resetData() {
     _data = JSON.parse(JSON.stringify(defaultData));
-    save();
-    return true;
+    return save();
+  }
+
+  function getLastSaveError() {
+    return _lastSaveError;
   }
 
   // 初始化
@@ -565,7 +575,8 @@ const DataLayer = (function () {
     addItem,
     updateItem,
     deleteItem,
-    resetData
+    resetData,
+    getLastSaveError
   };
 })();
 

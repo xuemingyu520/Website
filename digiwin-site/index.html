@@ -136,10 +136,14 @@
   var solutions = DataLayer.getData('solutions').filter(function(s) { return s.status === 'published'; });
   solutions.sort(function(a, b) { return a.order - b.order; });
   var icons = { city: '🏙️', factory: '🏭', agriculture: '🌱', military: '🛰️', visual: '🖥️' };
-  document.getElementById('solutions-grid').innerHTML = solutions.map(function(s) { return '<a href="solutions.html#' + s.id + '" class="card-glass sol-card fade-in visible"><div class="sol-cover">' + (icons[s.icon] || '●') + '</div><div class="sol-body"><h3>' + s.title + '</h3><p>' + s.summary + '</p><span style="color:var(--accent);font-size:0.9rem;font-weight:600;">了解详情 &rarr;</span></div></a>'; }).join('');
+  function coverStyle(url) {
+    if (!url) return '';
+    return ' style="background-image:url(\'' + String(url).replace(/'/g, '%27') + '\');background-size:cover;background-position:center;"';
+  }
+  document.getElementById('solutions-grid').innerHTML = solutions.map(function(s) { return '<a href="solutions.html#' + s.id + '" class="card-glass sol-card fade-in visible"><div class="sol-cover"' + coverStyle(s.coverImage) + '>' + (s.coverImage ? '' : (icons[s.icon] || '●')) + '</div><div class="sol-body"><h3>' + s.title + '</h3><p>' + s.summary + '</p><span style="color:var(--accent);font-size:0.9rem;font-weight:600;">了解详情 &rarr;</span></div></a>'; }).join('');
   var cases = DataLayer.getData('cases').filter(function(c) { return c.status === 'published'; });
   cases.sort(function(a, b) { return a.order - b.order; });
-  document.getElementById('featured-cases-grid').innerHTML = cases.slice(0, 3).map(function(c) { return '<div class="card-glass case-card-home fade-in visible"><div class="case-cover">📄</div><div class="case-body"><span class="tag tag-cyan">' + c.category + '</span><h3>' + c.title + '</h3><p>' + c.summary + '</p></div></div>'; }).join('');
+  document.getElementById('featured-cases-grid').innerHTML = cases.slice(0, 3).map(function(c) { return '<div class="card-glass case-card-home fade-in visible"><div class="case-cover"' + coverStyle(c.coverImage) + '>' + (c.coverImage ? '' : '📄') + '</div><div class="case-body"><span class="tag tag-cyan">' + c.category + '</span><h3>' + c.title + '</h3><p>' + c.summary + '</p><a href="case-detail.html?id=' + encodeURIComponent(c.id) + '" class="btn-outline" style="margin-top:16px;padding:8px 16px;font-size:0.85rem;">查看详情</a></div></div>'; }).join('');
 })();
 </script>
 </body>

@@ -24,7 +24,8 @@
   font-weight: 500;
   transition: all var(--transition-fast);
 }
-.filter-btn:hover, .filter-btn.active {
+.filter-btn:hover,
+.filter-btn.active {
   background: rgba(0,229,255,0.1);
   color: var(--accent);
   border-color: var(--accent);
@@ -32,7 +33,7 @@
 .case-card {
   overflow: hidden;
   padding: 0;
-  cursor: pointer;
+  display: block;
 }
 .case-card .case-cover {
   height: 200px;
@@ -65,7 +66,6 @@
 </style>
 </head>
 <body>
-
 <div id="preloader"><div class="preloader-spinner"></div></div>
 
 <nav class="navbar">
@@ -83,7 +83,7 @@
 
 <section class="page-hero">
   <h1>案例展示</h1>
-  <p>每一个项目都是我们对卓越的承诺，见证数字孪生技术在真实场景中的价值落地</p>
+  <p>每一个项目，都是我们对卓越的承诺，见证数字孪生技术在真实场景中的价值落地</p>
 </section>
 
 <div class="container">
@@ -105,36 +105,39 @@
 <script src="assets/js/main.js"></script>
 <script>
 (function() {
-  // 渲染导航
   var nav = DataLayer.getData('navigation').filter(function(n) { return n.visible; });
   document.getElementById('navbar-links').innerHTML = nav.map(function(n) {
     return '<a href="' + n.href + '">' + n.label + '</a>';
   }).join('');
 
-  // 渲染案例
   var cases = DataLayer.getData('cases').filter(function(c) { return c.status === 'published'; });
   cases.sort(function(a, b) { return a.order - b.order; });
+
+  function coverStyle(url) {
+    if (!url) return '';
+    return ' style="background-image:url(\'' + String(url).replace(/'/g, '%27') + '\');background-size:cover;background-position:center;"';
+  }
 
   function renderCases(filter) {
     var filtered = filter === 'all' ? cases : cases.filter(function(c) { return c.category === filter; });
     document.getElementById('cases-grid').innerHTML = filtered.map(function(c) {
-      return '<div class="card-glass case-card fade-in" data-category="' + c.category + '">' +
-        '<div class="case-cover">&#128196;</div>' +
+      return '<div class="card-glass case-card fade-in visible" data-category="' + c.category + '">' +
+        '<div class="case-cover"' + coverStyle(c.coverImage) + '>' + (c.coverImage ? '' : '&#128196;') + '</div>' +
         '<div class="case-body"><span class="tag tag-cyan">' + c.category + '</span>' +
-        '<h3>' + c.title + '</h3><p>' + c.summary + '</p></div></div>';
+        '<h3>' + c.title + '</h3><p>' + c.summary + '</p>' +
+        '<a href="case-detail.html?id=' + encodeURIComponent(c.id) + '" class="btn-outline" style="margin-top:16px;padding:8px 16px;font-size:0.85rem;">查看详情</a></div></div>';
     }).join('');
-
-    // 重新触发动画
-    setTimeout(function() {
-      document.querySelectorAll('.fade-in').forEach(function(el) {
-        el.classList.add('visible');
-      });
-    }, 50);
   }
 
   renderCases('all');
 
-  // 筛选事件已在 main.js 中处理
+  document.querySelectorAll('.filter-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      renderCases(btn.getAttribute('data-category'));
+    });
+  });
 })();
 </script>
 </body>
