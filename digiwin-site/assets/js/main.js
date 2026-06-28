@@ -5,13 +5,23 @@
   'use strict';
 
   // ---- 预加载动画 ----
-  window.addEventListener('load', function () {
+  function hidePreloader() {
     const preloader = document.getElementById('preloader');
     if (preloader) {
       setTimeout(function () {
         preloader.classList.add('hidden');
       }, 400);
     }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', hidePreloader);
+  } else {
+    hidePreloader();
+  }
+
+  window.addEventListener('load', function () {
+    hidePreloader();
   });
 
   // ---- 导航栏滚动效果 ----

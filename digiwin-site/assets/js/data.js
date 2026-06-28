@@ -596,3 +596,5 @@ const DataLayer = (function () {
   };
 })();
 
+window.DataLayer = DataLayer;
+
