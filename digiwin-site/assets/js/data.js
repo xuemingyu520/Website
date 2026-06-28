@@ -1,6 +1,6 @@
 ﻿/**
  * 云孪信息科技 - 统一数据层
- * 前后台共享，数据持久化到 localStorage
+ * 前台读取发布数据，后台编辑页使用 localStorage 保存草稿
  */
 const DataLayer = (function () {
   'use strict';
@@ -8,6 +8,7 @@ const DataLayer = (function () {
   const STORAGE_KEY = 'digiwin_site_data';
   const VERSION_KEY = 'digiwin_site_version';
   const DATA_VERSION = 5;
+  const IS_ADMIN_CONTEXT = /\/admin(?:\/|$)/.test(window.location.pathname);
 
   const builtinDefaultData = {
     siteConfig: {
@@ -465,6 +466,11 @@ const DataLayer = (function () {
   }
 
   function init() {
+    if (!IS_ADMIN_CONTEXT) {
+      _data = JSON.parse(JSON.stringify(defaultData));
+      return;
+    }
+
     try {
       const storedVer = localStorage.getItem(VERSION_KEY);
       const stored = localStorage.getItem(STORAGE_KEY);
@@ -485,6 +491,11 @@ const DataLayer = (function () {
   }
 
   function save() {
+    if (!IS_ADMIN_CONTEXT) {
+      _lastSaveError = new Error('Public pages are read-only.');
+      return false;
+    }
+
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(_data));
       localStorage.setItem(VERSION_KEY, String(DATA_VERSION));
