@@ -9,7 +9,7 @@ const DataLayer = (function () {
   const VERSION_KEY = 'digiwin_site_version';
   const DATA_VERSION = 5;
 
-  const defaultData = {
+  const builtinDefaultData = {
     siteConfig: {
       name: '云孪信息科技',
       subtitle: 'Digital Twin Solutions',
@@ -439,6 +439,13 @@ const DataLayer = (function () {
     ]
   };
 
+  const defaultData = (function () {
+    if (window.DIGIWIN_SITE_DATA && typeof window.DIGIWIN_SITE_DATA === 'object') {
+      return window.DIGIWIN_SITE_DATA;
+    }
+    return builtinDefaultData;
+  })();
+
   let _data = null;
   let _lastSaveError = null;
 
@@ -507,6 +514,15 @@ const DataLayer = (function () {
 
   function setData(key, value) {
     if (!_data) init();
+    if (!key) {
+      const oldData = _data;
+      _data = value;
+      if (!save()) {
+        _data = oldData;
+        return false;
+      }
+      return true;
+    }
     const keys = key.split('.');
     let target = _data;
     for (let i = 0; i < keys.length - 1; i++) {

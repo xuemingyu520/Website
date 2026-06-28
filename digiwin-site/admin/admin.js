@@ -183,6 +183,93 @@
     if (newsEl) newsEl.textContent = news.length;
   }
 
+  function serializeSiteData() {
+    var data = DataLayer.getData();
+    return [
+      '/*',
+      ' * 项目数据文件。',
+      ' * 由后台管理系统导出。覆盖 site-content/site-data.js 后提交到 GitHub 即可发布。',
+      ' * 导出时间: ' + new Date().toISOString(),
+      ' */',
+      'window.DIGIWIN_SITE_DATA = ' + JSON.stringify(data, null, 2) + ';',
+      'window.DIGIWIN_SITE_DATA_UPDATED_AT = "' + new Date().toISOString() + '";',
+      ''
+    ].join('\n');
+  }
+
+  function downloadTextFile(filename, text) {
+    var blob = new Blob([text], { type: 'application/javascript;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+
+  function parseImportedData(text) {
+    var jsonText = text;
+    var match = text.match(/window\.DIGIWIN_SITE_DATA\s*=\s*([\s\S]*?);\s*window\.DIGIWIN_SITE_DATA_UPDATED_AT/);
+    if (match) {
+      jsonText = match[1];
+    }
+    return JSON.parse(jsonText);
+  }
+
+  function initDataPublishTools() {
+    var exportBtn = document.getElementById('btn-export-data');
+    var importBtn = document.getElementById('btn-import-data');
+    var importInput = document.getElementById('import-data-file');
+    var resetBtn = document.getElementById('btn-reset-local-data');
+
+    if (exportBtn) {
+      exportBtn.addEventListener('click', function () {
+        downloadTextFile('site-data.js', serializeSiteData());
+        showToast('已导出 site-data.js，请覆盖 site-content/site-data.js 后推送 GitHub', 'success');
+      });
+    }
+
+    if (importBtn && importInput) {
+      importBtn.addEventListener('click', function () {
+        importInput.click();
+      });
+      importInput.addEventListener('change', function () {
+        var file = importInput.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          try {
+            var data = parseImportedData(e.target.result);
+            if (!DataLayer.setData('', data)) {
+              showSaveError();
+              return;
+            }
+            showToast('数据已导入当前浏览器', 'success');
+            setTimeout(function () { window.location.reload(); }, 600);
+          } catch (err) {
+            showToast('导入失败：文件格式不正确', 'error');
+          }
+        };
+        reader.readAsText(file);
+        importInput.value = '';
+      });
+    }
+
+    if (resetBtn) {
+      resetBtn.addEventListener('click', function () {
+        if (!confirm('确定清空当前浏览器中的后台编辑数据，并恢复项目文件中的默认数据吗？')) return;
+        if (!DataLayer.resetData()) {
+          showSaveError();
+          return;
+        }
+        showToast('本地草稿已清空', 'success');
+        setTimeout(function () { window.location.reload(); }, 600);
+      });
+    }
+  }
+
   // ---- 通用表格渲染 ----
   function renderTable(containerId, items, columns, actions, key) {
     var container = document.getElementById(containerId);
@@ -696,6 +783,7 @@
   if (document.getElementById('admin-panels')) {
     initAdmin();
     initAddButtons();
+    initDataPublishTools();
   }
 
   // 键盘 ESC 关闭弹窗
